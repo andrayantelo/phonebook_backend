@@ -1,0 +1,27 @@
+{
+  "name": "phonebook_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrayantelo/phonebook_backend.git"
+  },
+  "author": "Andrea Anaya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andrayantelo/phonebook_backend/issues"
+  },
+  "homepage": "https://github.com/andrayantelo/phonebook_backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.3"
+  }
+}
