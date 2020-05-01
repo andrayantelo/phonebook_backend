@@ -1,10 +1,12 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 
 const MAX = 1000
 
 app.use(express.json())
+app.use(cors())
 
 morgan.token('data', function getId (req) {
     return JSON.stringify(req.body)
