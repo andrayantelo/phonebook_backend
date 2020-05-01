@@ -7,7 +7,7 @@ const MAX = 1000
 
 app.use(express.json())
 app.use(cors())
-app.use(express.static('build'))
+//app.use(express.static('build'))
 
 morgan.token('data', function getId (req) {
     return JSON.stringify(req.body)
