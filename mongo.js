@@ -7,9 +7,7 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2]
 
-const url = 
-    `mongodb+srv://andrayantelo:${password}@cluster0-emb6d.mongodb.net/phonebook-app?retryWrites=true&w=majority`
-
+const url = MONGODB_URI
 mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true})
 
 const personSchema = new mongoose.Schema({
