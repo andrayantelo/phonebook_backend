@@ -7,10 +7,11 @@ const Person = require('./models/person')
 
 const MAX = 1000
 
-app.use(express.json())
 app.use(cors())
+app.use(express.json())
 app.use(express.static('build'))
 
+// morgan logger middleware
 morgan.token('data', function getId (req) {
     return JSON.stringify(req.body)
 })
@@ -42,28 +43,48 @@ app.get('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
-    Person.find({}).then(people => {
-        const numPeople = people.length
-        const now = new Date()
+app.get('/info', (req, res, next) => {
+    Person.find({})
+        .then(people => {
+            const numPeople = people.length
+            const now = new Date()
 
-        const renderDiv = `
-            <div> Phonebook has info for ${numPeople} people</div>
-            <br />
-            <div>${now}</div>
-        `
-        res.send(renderDiv)
-    })
+            const renderDiv = `
+                <div> Phonebook has info for ${numPeople} people</div>
+                <br />
+                <div>${now}</div>
+            `
+            res.send(renderDiv)
+        })
+        .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-    Person.findByIdAndRemove(req.params.id).then(person => {
-        console.log("Deleted", person.name, person.number, "from phonebook")
-        res.status(204).end()
-    })
+app.delete('/api/persons/:id', (req, res, next) => {
+    Person.findByIdAndRemove(req.params.id)
+        .then(person => {
+            if (person) {
+                console.log("Deleted", person.name, person.number, "from phonebook")
+            }
+            res.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => {
+            res.json(updatedPerson.toJSON())
+        })
+        .catch(error => next(error))
+})
+
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
     
     if (body.name === undefined || body.number === undefined) {
@@ -77,9 +98,11 @@ app.post('/api/persons', (req, res) => {
         number: body.number
     })
 
-    person.save().then(savedPerson => {
-        res.json(savedPerson.toJSON())
-    })
+    person.save()
+        .then(savedPerson => {
+            res.json(savedPerson.toJSON())
+        })
+        .catch(error => next(error))
 })
 
 // unknown endpoint middleware
