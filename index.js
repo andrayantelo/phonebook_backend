@@ -17,9 +17,6 @@ morgan.token('data', function getId (req) {
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
-const unknownEndpoint = (req, res) => {
-    res.status(404).send({ error: 'unknown endpoint' })
-}
 
 app.get('/', (req, res) => {
     res.send('<h1>Hello World!</h1>')
@@ -33,10 +30,16 @@ app.get('/api/persons', (req, res) => {
 
 app.get('/favicon.ico', (req, res) => res.status(204));
 
-app.get('/api/persons/:id', (req, res) => {
-    Person.findById(req.params.id).then(person => {
-        res.json(person.toJSON())
-    })
+app.get('/api/persons/:id', (req, res, next) => {
+    Person.findById(req.params.id)
+        .then(person => {
+            if (person) {
+                res.json(person.toJSON())
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.get('/info', (req, res) => {
@@ -54,7 +57,7 @@ app.get('/info', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-    Person.findByIdAndDelete(req.params.id).then(person => {
+    Person.findByIdAndRemove(req.params.id).then(person => {
         console.log("Deleted", person.name, person.number, "from phonebook")
         res.status(204).end()
     })
@@ -79,8 +82,25 @@ app.post('/api/persons', (req, res) => {
     })
 })
 
+// unknown endpoint middleware
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'unknown endpoint' })
+}
 
 app.use(unknownEndpoint)
+
+// error handling middleware
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    } 
+  
+    next(error)
+  }
+  
+  app.use(errorHandler)
 
 const PORT= process.env.PORT || 3001
 app.listen(PORT, () => {
