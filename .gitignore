@@ -1,0 +1,8 @@
+# editors
+.vscode
+
+node_modules
+/requests
+
+.env
+
