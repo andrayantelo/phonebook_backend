@@ -5,8 +5,6 @@ const cors = require('cors')
 const app = express()
 const Person = require('./models/person')
 
-const MAX = 1000
-
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
@@ -29,7 +27,7 @@ app.get('/api/persons', (req, res) => {
     })
 })
 
-app.get('/favicon.ico', (req, res) => res.status(204));
+app.get('/favicon.ico', (req, res) => res.status(204))
 
 app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
@@ -63,7 +61,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndRemove(req.params.id)
         .then(person => {
             if (person) {
-                console.log("Deleted", person.name, person.number, "from phonebook")
+                console.log('Deleted', person.name, person.number, 'from phonebook')
             }
             res.status(204).end()
         })
@@ -76,12 +74,11 @@ app.put('/api/persons/:id', (req, res, next) => {
         name: body.name,
         number: body.number
     }
-    
     const opts = {
         runValidators: true,
         new: true,
         context: 'query'
-    };
+    }
     Person.findByIdAndUpdate(req.params.id, person, opts)
         .then(updatedPerson => {
             if (updatedPerson) {
@@ -89,14 +86,14 @@ app.put('/api/persons/:id', (req, res, next) => {
             } else {
                 res.status(204).end()
             }
-            
+
         })
         .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res, next) => {
     const body = req.body
-    
+
     if (body.name === undefined || body.number === undefined) {
         return res.status(400).json({
             error: 'content missing'
@@ -125,17 +122,17 @@ app.use(unknownEndpoint)
 // error handling middleware
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
-  
+
     if (error.name === 'CastError') {
-      return response.status(400).send({ error: 'malformatted id' })
-    } else if (error.name === 'ValidationError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+    else if (error.name === 'ValidationError') {
         return response.status(400).json( { error: error.message })
     }
-  
     next(error)
-  }
-  
-  app.use(errorHandler)
+}
+
+app.use(errorHandler)
 
 const PORT= process.env.PORT || 3001
 app.listen(PORT, () => {
